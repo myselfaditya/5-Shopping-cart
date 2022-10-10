@@ -13,7 +13,8 @@ app.use(multer().any())
 mongoose.connect("mongodb+srv://matheenahamad:9TNGWEhzUB0Ttemi@matheen.vtdepfw.mongodb.net/group19Database", {
     useNewUrlParser: true
 })
-    .then(() => console.log("MongoDb is connected"), err => console.log(err))
+.then(() => console.log("MongoDb is connected .."))
+.catch((err) => console.log(err));
 
 app.use('/', route);
 
