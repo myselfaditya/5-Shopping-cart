@@ -31,22 +31,22 @@ let uploadFile= async ( file) =>{
 }
 
 
-const imageUpload = async(req,res) =>{
-    try{
-        let files= req.files
-        if(files && files.length>0){
-            let url = await uploadFile( files[0] )
-            res.status(201).send({status: true, message: "file uploaded succesfully", URLofImage:url})
-        }
-        else{
-            res.status(400).send({status: false, message: "No file found" })
-        }
+// const imageUpload = async(req,res) =>{
+//     try{
+//         let files= req.files
+//         if(files && files.length>0){
+//             let url = await uploadFile( files[0] )
+//             res.status(201).send({status: true, message: "file uploaded succesfully", URLofImage:url})
+//         }
+//         else{
+//             res.status(400).send({status: false, message: "No file found" })
+//         }
         
-    }
-    catch(err){
-        res.status(500).send({status: false, message: err})
-    }
-}
+//     }
+//     catch(err){
+//         res.status(500).send({status: false, message: err})
+//     }
+// }
 
 
-module.exports = {imageUpload }
+module.exports = {uploadFile}

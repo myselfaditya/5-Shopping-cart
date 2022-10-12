@@ -13,10 +13,10 @@ const isValidRequestBody = (value) => {
 }
 
 const isValidMobile = /^[6-9]{1}[0-9]{9}$/;
-const validPin = /^[1-9][0-9]{6}$/;
+const validPin = /^[1-9][0-9]{5}$/;
 
 const isValidPassword = function (value) {
-    if (/^(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$%^&*-]).{8,15}$/.test(value)) return true;
+    if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(value)) return true;
     return false;
 };
 
