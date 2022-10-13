@@ -1,7 +1,7 @@
 const productModel = require("../model/productModel")
 const { uploadFile } = require("./aws")
 
-const { isValidRequestBody, isValid, isValidName, imgUrl, validSizes, isValidPrice, isValidNumber } = require("../validator/validation")
+const { isValidRequestBody, isValid, isValidName, validSizes, isValidPrice, isValidNumber } = require("../validator/validation")
 
 const createProduct = async function (req, res) {
     try {
@@ -23,37 +23,36 @@ const createProduct = async function (req, res) {
         if (!isValidPrice(price)) return res.status(400).send({ status: false, message: "Provied the valid price" })
 
         if (!currencyId) return res.status(400).send({ status: false, message: "currencyId is required" })
-        if (!currencyId) return res.status(400).send({ status: false, message: "currencyId is required" })
         if (!isValid(currencyId)) return res.status(400).send({ status: false, message: "Provied the Valid curruencyId" })
         if (!(/INR/.test(currencyId))) return res.status(400).send({ status: false, message: " currencyId should be in 'INR' Format" });
 
+        if (!currencyFormat) return res.status(400).send({ status: false, message: "currencyformat is required" })
         if (!isValid(currencyFormat)) return res.status(400).send({ status: false, message: "Currency format of product should not be empty" });
         if (currencyFormat) {
             if (!(/₹/.test(currencyFormat))) return res.status(400).send({ status: false, message: "Currency format of product should be in '₹' " });
         } else {
             data.currencyFormat = "₹"
         }
-        
-        
+
         let files = req.files
         if (files.length == 0) return res.status(400).send({ status: false, msg: "productImage is mandatory" })
-        let ImageLink = await uploadFile(files[0]) 
+        let ImageLink = await uploadFile(files[0])
         productImage = ImageLink
 
-        if (!isValid(style)) return res.status(400).send({ status: false, message: "Pls Provie the style" })
+        if (!isValid(style)) return res.status(400).send({ status: false, message: "Provie a valid style" })
 
         if (!isValid(availableSizes)) return res.status(400).send({ status: false, message: "provie the valid give availableSizes only" })
         if (!validSizes(availableSizes)) return res.status(400).send({ status: false, message: "provied valid sizes" })
 
-        if (!isValidNumber(installments)) return res.status(400).send({ status: false, message: "Provied the valid installments, Installments will be in number format only" })
-        if(deletedAt){
+        if (!isValidNumber(installments)) return res.status(400).send({ status: false, message: "Provied the valid installments and it will be in number format only" })
+
+        if (deletedAt) {
             if (deletedAt !== null) return res.status(406).send({ status: false, message: "DeletedAt must be null" })
         }
 
-        if(isDeleted){
-        if (isDeleted !== false) return res.status(406).send({ status: false, message: "IsDeleted must be false, while creating document" })
+        if (isDeleted) {
+            if (isDeleted !== false) return res.status(406).send({ status: false, message: "IsDeleted must be false, while creating document" })
         }
-        
 
         const productData = { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments, deletedAt, isDeleted }
         let product = await productModel.create(productData)
