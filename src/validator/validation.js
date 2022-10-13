@@ -9,7 +9,7 @@ const isValid = (value) => {
 }
 
 let isValidNumber = (String) => {
-    return /\d/.test(String) ///560.23  
+    return /\d/.test(String)  
 }
 const isValidPrice=function(value){
     let pricePattern=/^[0-9.]{1,15}$/;

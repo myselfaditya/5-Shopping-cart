@@ -3,12 +3,6 @@ const userModel = require("../model/userModel")
 const mongoose = require('mongoose')
 
 
-// const isValidObjectId = function (objectId) {
-//     return mongoose.Types.ObjectId.isValid(objectId)
-// }
-
-
-
 const authentication = function (req, res, next) {
     try {
         let token = req.header('Authorization')
