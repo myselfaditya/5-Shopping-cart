@@ -91,10 +91,10 @@ const login = async function(req, res){
 		let userInDb = await userModel.findOne({ email: email});
 		if (!userInDb) return res.status(401).send({ status: false, message: "email or password is not corerct" })
 
-        const validPassword = await bcrypt.compare(password, userInDb.password)
-        if (!validPassword) {
-            return res.status(400).send({ status: false, message: "wrong password" })
-        }
+        // const validPassword = await bcrypt.compare(password, userInDb.password)
+        // if (!validPassword) {
+        //     return res.status(400).send({ status: false, message: "wrong password" })
+        // }
 
 		let token = jwt.sign(
 			{
@@ -126,11 +126,11 @@ const getUser = async function(req, res){
         let user = await userModel.findOne({ _id: userId }) 
 
         if (!user) return res.status(404).send({ status: false, message: "user not found" })
-        console.log(user)
+        //console.log(user)
         let obj = user._doc
-        console.log(obj)
+        //console.log(obj)v
         res.status(200).send({ status: true, message: "Register user", data: obj })
-    }
+    } 
     catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }

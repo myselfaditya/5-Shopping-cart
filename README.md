@@ -425,7 +425,7 @@ Refer below sample
   _id: ObjectId("88abc190ef0288abc190ef55"),
   title: 'Nit Grit',
   description: 'Dummy description',
-  price: 23.0,
+  price: 23.0,+
   currencyId: 'INR',
   currencyFormat: '₹',
   isFreeShipping: false,
