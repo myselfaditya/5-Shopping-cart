@@ -11,6 +11,7 @@ const isValid = (value) => {
 let isValidNumber = (String) => {
     return /\d/.test(String)  
 }
+
 const isValidPrice=function(value){
     let pricePattern=/^[0-9.]{1,15}$/;
     if(!(pricePattern.test(value))) return false
@@ -22,6 +23,7 @@ const isValidRequestBody = (value) => {
 }
 
 const isValidMobile = /^[6-9]{1}[0-9]{9}$/;
+
 const validPin = /^[1-9][0-9]{5}$/;
 
 const validSizes = function (value) {
@@ -34,8 +36,6 @@ const validSizes = function (value) {
         return false
     }
 }
-
-
 
 const isValidPassword = function (value) {
     if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(value)) return true;
