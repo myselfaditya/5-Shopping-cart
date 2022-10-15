@@ -3,7 +3,7 @@ const isValidMail = (/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/);
 const isValidName = (/^[a-zA-Z. ]{1,20}$/)
 
 const isValid = (value) => {
-    if (typeof value === "undefined" || value === null) return false
+    if (typeof value === "undefined" || value === " " || value === null) return false
     if (typeof value === "string" && value.trim().length === 0) return false
     return true
 }

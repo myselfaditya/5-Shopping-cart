@@ -101,6 +101,96 @@ const getProductById = async function (req, res) {
 const updateProduct = async function (req, res) {
     try {
 
+        let productId = req.params.productId
+        let data = req.body
+
+        if (!mongoose.isValidObjectId(productId)) return res.status(400).send({ status: false, message: "Invalid productId" })
+
+        let productsDb = await productModel.findOne({ _id: productId })
+
+        if (!productsDb) return res.status(404).send({ status: false, message: "products are not found" })
+
+        if (!isValidRequestBody(data)) return res.status(400).send({ status: false, msg: "body cant't be empty Please enter some data." })
+
+        const filter = { isDeleted: false }
+
+        let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments } = data
+
+
+        if (filter.hasOwnProperty(title)) {
+            if (!isValid(title)) return res.status(400).send({ status: false, message: "title not be empty" });
+            if (!isValidName.test(title)) return res.status(400).send({ status: false, message: "title only on string" })
+            let uniquetitle = await productModel.findOne({ title: title })
+            if (uniquetitle) return res.status(400).send({ status: false, message: "title Already Exists" })
+            filter.title = uniquetitle
+        }
+
+        if (filter.hasOwnProperty(description)) {
+            if (!isValid(description)) return res.status(400).send({ status: false, message: " description not be empty" });
+            if (!isValidName.test(description)) return res.status(400).send({ status: false, message: " description only on string" })
+            filter.description = description
+        }
+
+        if (filter.hasOwnProperty(price)) {
+            if (!isValid(price)) return res.status(400).send({ status: false, message: "price not be empty" });
+            if (!isValidPrice.test(price)) return res.status(400).send({ status: false, message: "price only on string" })
+            filter.price = price
+        }
+
+        if (filter.hasOwnProperty(currencyId)) {
+            if (!currencyId) return res.status(400).send({ status: false, message: "currencyId is required" })
+            if (!isValid(currencyId)) return res.status(400).send({ status: false, message: "Provied the Valid curruencyId" })
+            if (!(/INR/.test(currencyId))) return res.status(400).send({ status: false, message: " currencyId should be in 'INR' Format" });
+            filter.currencyId = currencyId
+        }
+
+        if (filter.hasOwnProperty(style)) {
+            if (!currencyFormat) return res.status(400).send({ status: false, message: "currencyformat is required" })
+            if (!isValid(currencyFormat)) return res.status(400).send({ status: false, message: "Currency format of product should not be empty" });
+            if (currencyFormat) {
+                if (!(/₹/.test(currencyFormat))) return res.status(400).send({ status: false, message: "Currency format of product should be in '₹' " });
+            } else {
+                data.currencyFormat = "₹"
+            }
+            filter.currencyFormat = currencyFormat
+        }
+
+        if (filter.hasOwnProperty(productImage)) {
+            let files = req.files
+            if (!isValid(files)) return res.status.send({ status: false, message: "provie files should not be empty" })
+            let ImageLink = await uploadFile(files[0])
+            filter.productImage = ImageLink
+        }
+
+        // if (filter.hasOwnProperty(isFreeShipping)) {
+        //     if (isFreeShipping !== false) return res.status(406).send({ status: false, message: "isFreeShipping must be true & false only" })
+        //     filter.isFreeShipping = isFreeShipping
+        // }
+
+        if (filter.hasOwnProperty(style)) {
+            if (!isValid(style)) return res.status(400).send({ status: false, message: "Provie a valid style" })
+            filter.style = style
+        }
+
+        if (filter.hasOwnProperty(availableSizes)) {
+            if (!isValid(availableSizes)) return res.status(400).send({ status: false, message: "provie the valid give availableSizes only" })
+            if (!validSizes(availableSizes)) return res.status(400).send({ status: false, message: "provied valid sizes" })
+            filter.availableSizes = availableSizes
+        }
+
+        if (filter.hasOwnProperty(installments)) {
+            if (!isValidNumber(installments)) return res.status(400).send({ status: false, message: "Provied the valid installments and it will be in number format only" })
+            filter.installments = installments
+        }
+
+
+
+        const productIs = await productModel.findOneAndUpdate({ _id: productId }, { $set: filter }, { new: true })
+
+        if (!productIs) return res.status(404).send({ status: false, message: "productIs not found" })
+
+        res.status(200).send({ Status: true, message: "product updated Successfully", Data: productIs })
+
     }
     catch (err) {
         res.status(500).send({ status: false, message: err.message })
