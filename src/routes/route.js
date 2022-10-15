@@ -13,7 +13,7 @@ router.put("/user/:userId/profile", authentication, authorization, updateUser)
 
 //=========================================================== Product Api's ============================================================//
 router.post("/products", createProduct)
-router.post("/products", getProduct)
+router.get("/products", getProduct)
 router.get("/products/:productId", getProductById)
 router.put("/products/:productId", updateProduct)
 router.delete("/products/:productId", deleteProduct) 

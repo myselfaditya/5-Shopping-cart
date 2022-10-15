@@ -7,7 +7,7 @@ const authentication = function (req, res, next) {
     try {
         let token = req.header('Authorization')
         if (!token) {
-            return res.status(401).send({ status: false, msg: " token is required" })
+            return res.status(400).send({ status: false, msg: " token is required" })
         }
         let newToken = token.split(' ')[1] 
         let decodedToken = jwt.verify(newToken, "secret code group 19", { ignoreExpiration: true })

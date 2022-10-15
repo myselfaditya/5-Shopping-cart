@@ -8,9 +8,18 @@ const isValid = (value) => {
     return true
 }
 
+const isValidfild = (value) => {
+    if (typeof value === "string" && value.trim().length === 0) return false
+    return true
+}
+
 let isValidNumber = (String) => {
     return /\d/.test(String)  
 }
+
+const isValidDigit=function(value) {
+    return /^\d+$/.test(value)
+} 
 
 const isValidPrice=function(value){
     let pricePattern=/^[0-9.]{1,15}$/;
@@ -42,10 +51,12 @@ const isValidPassword = function (value) {
     return false;
 };
 
+
+
 let imgUrl = /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i
 
 //const regExLogoLink =  /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
 
 module.exports = {
-    isValidMail, isValid, isValidName, isValidRequestBody,isValidMobile, isValidPrice, validSizes, isValidNumber, isValidPassword, imgUrl, validPin
+    isValidMail, isValid, isValidName, isValidRequestBody,isValidMobile, isValidfild, isValidPrice, validSizes, isValidNumber, isValidPassword, imgUrl, validPin, isValidDigit
 }
