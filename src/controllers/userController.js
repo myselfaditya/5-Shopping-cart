@@ -13,7 +13,7 @@ const createUser = async function (req, res) {
 
         if (!isValidRequestBody(data)) return res.status(400).send({ status: false, msg: "body cant't be empty Please enter some data." })
 
-        let { fname, lname, email, profileImage, phone, password, address } = data
+        let { fname, lname, email, phone, password, address, profileImage } = data
 
         if (!isValid(fname)) return res.status(400).send({ status: false, message: "fname is required" })
         if (!isValid(lname)) return res.status(400).send({ status: false, message: "lname is  required" })
@@ -40,6 +40,7 @@ const createUser = async function (req, res) {
         let files = req.files
         if (files.length == 0) return res.status(400).send({ status: false, msg: "profileImage is mandatory" })
         let ImageLink = await uploadFile(files[0]) // using aws for link creation 
+      
         profileImage = ImageLink
 
         if (!isValidMobile.test(phone)) return res.status(406).send({
@@ -72,7 +73,7 @@ const createUser = async function (req, res) {
         if (!isValid(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter billing pincode" })
         if (!validPin.test(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter valied billing pincode " })
 
-        const userData = { fname, lname, email, profileImage, phone, password, address }
+        const userData = { fname, lname, email, phone, password, address, profileImage }
         let savedData = await userModel.create(userData)
         res.status(201).send({ status: true, message: "Success", data: savedData })
     }

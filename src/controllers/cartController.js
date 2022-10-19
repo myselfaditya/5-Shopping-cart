@@ -101,7 +101,7 @@ const getCart = async function (req, res) {
 
         let userInDb = await userModel.findOne({ userId: userId })
         if (!userInDb) return res.status(404).send({ status: false, message: "User not found" })
-
+       
         let cartInDb = await cartModel.findOne({ userId: userId }).populate({ path: "items.productId", select: { title: 1, price: 1, productImage: 1, availableSizes: 1 } })
         if (!cartInDb) return res.status(404).send({ status: false, message: "Cart not found" })
 
