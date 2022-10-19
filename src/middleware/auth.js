@@ -7,10 +7,10 @@ const authentication = function (req, res, next) {
     try {
         let token = req.header('Authorization')
         if (!token) {
-            return res.status(400).send({ status: false, msg: " token is required" })
+            return res.status(401).send({ status: false, msg: " token is required" })
         }
-        let newToken = token.split(' ')[1] 
-        let decodedToken = jwt.verify(newToken, "secret code group 19", { ignoreExpiration: true })
+        let newToken = token.split(' ')
+        let decodedToken = jwt.verify(newToken[1], "secret code group 19", { ignoreExpiration: true })
         if (!decodedToken) {
             return res.status(401).send({ status: false, msg: "token is invalid" })
         }
@@ -18,12 +18,20 @@ const authentication = function (req, res, next) {
         if (decodedToken.exp < timeToExpire) {
             return res.status(401).send({ status: false, msg: "token is expired please login again" })
         }
-
+        req.decodedToken = decodedToken.userId
         next()
     }
-    catch (error) {
-        console.log(error)
-        res.status(500).send({ msg: error })
+    
+    catch (err) {
+        if (err.message == "invalid token") {
+            return res.status(401).send({ status: false, message: "token is invalid" });
+        }
+        if (err.message == "invalid signature") {
+            return res.status(401).send({ status: false, message: "token is invalid" });
+        }
+
+        return res.status(500).send({ status: false, message: err.message });
+
     }
 }
 

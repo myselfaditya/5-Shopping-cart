@@ -4,15 +4,12 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("./aws")
 
-const value = function (valid) {
-
-}
 
 const { isValidMail, isValid, isValidName, isValidRequestBody, isValidMobile, isValidPassword, validPin, validString } = require("../validator/validation")
 
 const createUser = async function (req, res) {
     try {
-        let data = req.body
+        let data = req.body 
 
         if (!isValidRequestBody(data)) return res.status(400).send({ status: false, msg: "body cant't be empty Please enter some data." })
 
@@ -131,9 +128,7 @@ const getUser = async function (req, res) {
 
         if (!user) return res.status(404).send({ status: false, message: "user not found" })
 
-        let obj = user._doc
-
-        res.status(200).send({ status: true, message: "Register user", data: obj })
+        res.status(200).send({ status: true, message: "Register user", data: user })
     }
     catch (error) {
         return res.status(500).send({ status: false, message: error.message })
@@ -147,13 +142,9 @@ const updateUser = async function (req, res) {
 
         if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
 
-        let decodedToken=req.decodedToken
-
         let userDb = await userModel.findById(userId)
 
         if (!userDb) return res.status(404).send({ status: false, messgage: 'user not found' })
-        
-        if (userId !== decodedToken) return res.status(403).send({ status: false, messgage: "Unauthorized user" }) //Authorization
 
         let files = req.files
 

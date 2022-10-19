@@ -1,4 +1,4 @@
-const aws= require("aws-sdk")
+const aws = require("aws-sdk")
 
 
 //=================================================AWS COnfig ===============================================================//
@@ -8,26 +8,26 @@ aws.config.update({
     region: "ap-south-1"
 })
 
-let uploadFile= async ( file) =>{
-   return new Promise( function(resolve, reject) { 
-    let s3= new aws.S3({apiVersion: '2006-03-01'});                                   
+let uploadFile = async (file) => {
+    return new Promise(function (resolve, reject) {
+        let s3 = new aws.S3({ apiVersion: '2006-03-01' });
 
-    var uploadParams= {
-        ACL: "public-read",
-        Bucket: "classroom-training-bucket",  
-        Key: "abc/" + file.originalname,  
-        Body: file.buffer
-    }
-    
-    s3.upload( uploadParams, function (err, data ){
-        if(err) {
-            return reject({"error": err})
+        var uploadParams = {
+            ACL: "public-read",
+            Bucket: "classroom-training-bucket",
+            Key: "abc/" + file.originalname,
+            Body: file.buffer
         }
-        return resolve(data.Location)
-    })
 
-   })
+        s3.upload(uploadParams, function (err, data) {
+            if (err) {
+                return reject({ "error": err })
+            }
+            return resolve(data.Location)
+        })
+
+    })
 }
 
 
-module.exports = {uploadFile}
+module.exports = { uploadFile }
