@@ -25,7 +25,7 @@ const createProduct = async function (req, res) {
         if (!isValid(currencyId)) return res.status(400).send({ status: false, message: "currencyId is required" })
         if (!(/INR/.test(currencyId))) return res.status(400).send({ status: false, message: " currencyId should be in 'INR' Format" });
 
-        //if (!isValid(currencyFormat)) return res.status(400).send({ status: false, message: "currencyformat is required" });
+        if (!isValid(currencyFormat)) return res.status(400).send({ status: false, message: "currencyformat is required" });
         if (currencyFormat) {
             if (!(/₹/.test(currencyFormat))) return res.status(400).send({ status: false, message: "Currency format of product should be in '₹' " });
         } else {
@@ -33,7 +33,7 @@ const createProduct = async function (req, res) {
         }
 
         let files = req.files
-        //if (files.length == 0) return res.status(400).send({ status: false, msg: "productImage is mandatory and It must be file" })
+        if (files.length == 0) return res.status(400).send({ status: false, msg: "productImage is mandatory and It must be file" })
         let ImageLink = await uploadFile(files[0])
         productImage = ImageLink
 
