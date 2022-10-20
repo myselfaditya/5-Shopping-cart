@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt")
 const { uploadFile } = require("./aws")
 
 
-const { isValidMail, isValid, isValidName, isValidRequestBody, isValidMobile, isValidPassword, validPin, validString } = require("../validator/validation")
+const { isValidMail, isValid, isValidName, urlreg, isValidRequestBody, isValidMobile, isValidPassword, validPin, validString } = require("../validator/validation")
 
 const createUser = async function (req, res) {
     try {
@@ -23,16 +23,13 @@ const createUser = async function (req, res) {
         if (!isValid(address)) return res.status(400).send({ status: false, message: "address is required" })
 
         if (!isValidName.test(fname)) return res.status(406).send({
-            status: false, message: "Enter a valid fname",
-            validname: "length of f-name has to be in between (3-20), use only String"
-        })
+            status: false, message: "Enter a valid fname length of f-name has to be in between (3-20), use only String"})
+    
         if (!isValidName.test(lname)) return res.status(406).send({
-            status: false, message: "Enter a valid lastname",
-            validname: "length of L-name has to be in between (3-20), use only String "
-        })
+            status: false, message: "Enter a valid fname length of f-name has to be in between (3-20), use only String"})
+        
         if (!isValidMail.test(email)) return res.status(406).send({
-            status: false, message: "email id is not valid",
-            ValidMail: "email must be in correct format for e.g. xyz@abc.com"
+            status: false, message: "email must be in correct format for e.g. xyz@abc.com",
         })
         let uniqueEmail = await userModel.findOne({ email: email })
         if (uniqueEmail) return res.status(400).send({ status: false, message: "email Id Already Exists." })
@@ -40,12 +37,11 @@ const createUser = async function (req, res) {
         let files = req.files
         if (files.length == 0) return res.status(400).send({ status: false, msg: "profileImage is mandatory" })
         let ImageLink = await uploadFile(files[0]) // using aws for link creation 
-      
+        if (!urlreg.test(ImageLink))return res.status(406).send({status: false, message: "profileImage file should be in image format",})
         profileImage = ImageLink
 
         if (!isValidMobile.test(phone)) return res.status(406).send({
-            status: false, message: "mobile no. is not valid",
-            ValidMobile: "it must be 10 digit Number & it should be a indian mobile no."
+            status: false, message: "mobile no. is not valid it must be 10 digit Number & it should be a indian mobile no.",
         })
         let uniquePhone = await userModel.findOne({ phone: phone })
         if (uniquePhone) return res.status(400).send({ status: false, message: "phone no. Already Exists." })
@@ -56,6 +52,8 @@ const createUser = async function (req, res) {
         let newPassword = await bcrypt.hash(password, 10) //using bcrypt for password hashing
         password = newPassword
 
+        if(typeof data.address == "string"){ address = JSON.parse(data.address)}
+        data.address = address
         if (typeof address != "object") return res.status(400).send({ status: false, message: "Address body  should be in object form" });
         if (!isValidRequestBody(address)) return res.status(400).send({ status: false, message: "address cant't be empty Please enter some data." })
 
@@ -123,11 +121,11 @@ const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
 
-        if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
+        if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId in request" })
 
         let user = await userModel.findOne({ _id: userId })
 
-        if (!user) return res.status(404).send({ status: false, message: "user not found" })
+        if (!user) return res.status(404).send({ status: false, message: "user not found in database"})
 
         res.status(200).send({ status: true, message: "Register user", data: user })
     }
@@ -142,18 +140,17 @@ const updateUser = async function (req, res) {
         let userId = req.params.userId
 
         if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
+        
 
         let userDb = await userModel.findById(userId)
 
         if (!userDb) return res.status(404).send({ status: false, messgage: 'user not found' })
 
         let files = req.files
-
-        if(!isValid(files)) return res.status(400).send({status:false,message:"Please provide data to update the user"})
-
         const body = req.body
 
-        let { fname, lname, email, profileImage, phone, password, address } = body
+        let { fname, lname, email, phone, password, address } = body
+
 
         let data = {} //storing object
         
@@ -169,7 +166,6 @@ const updateUser = async function (req, res) {
             data.lname = lname
         }
  
-
         if (!validString(email)) return res.status(400).send({ status: false, message: "email not be empty" });
         if (email) {
             if (!isValidMail.test(email)) return res.status(400).send({ status: false, message: "email must be in correct format for e.g. xyz@abc.com" })
@@ -178,10 +174,10 @@ const updateUser = async function (req, res) {
             data.email = email
         }
 
-
-        if (profileImage) {
-        if(!validString(profileImage)) return res.status(400).send({ status: false, message: "Profile Image should not be Empty" })
+        
+        if (files && files.length != 0) {
             let ImageLink = await uploadFile(files[0])
+            if (!urlreg.test(ImageLink))return res.status(406).send({status: false, message: "profileImage file should be in image format",})
             data.profileImage = ImageLink
         }
  
@@ -205,53 +201,54 @@ const updateUser = async function (req, res) {
         }
 
 
-        if (!validString(address)) return res.status(400).send({ status: false, message: "address not be empty" });
-        if (address) {
-            data.address = userDb.address
-            let addressIn=JSON.parse(address)
- 
-            if (addressIn.shipping) {
-                if (!isValidRequestBody(addressIn.shipping)) return res.status(400).send({ status: false, message: "Shipping address cant't be empty Please enter some data." })
-                if (!validString(addressIn.shipping.street)) return res.status(400).send({ status: false, message: "please enter Shipping street " })
-                if(addressIn.shipping.street){
-                data.address.shipping.street = addressIn.shipping.street
+        if(address){
+            let addressData=await userModel.findById(userId).select({_id:0,address:1})
+            addressData=addressData.toObject()
+            address = JSON.parse(address)
+            // console.log(addressData)
+                if(address.shipping){
+                 if(address.shipping.street){
+                    if (!validString(address.shipping.street)) {
+                     return res.status(400).send({ status: false, message: "street field is  not valid" })
+                    }
+                    addressData.address.shipping.street=address.shipping.street
+                 }
+                 if(address.shipping.city){
+                     if (!validString(address.shipping.city))
+                         return res.status(400).send({ status: false, message: "city field is  not valid" })
+                    addressData.address.shipping.city=address.shipping.city
+                 }
+                
+                 if(address.shipping.pincode){
+                     if (!validPin.test(address.shipping.pincode))
+                         return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only " })
+                addressData.address.shipping.pincode=address.shipping.pincode
+                 }
                 }
                 
-                if (!validString(addressIn.shipping.city)) return res.status(400).send({ status: false, message: "please enter Shipping city" })
-                if(addressIn.shipping.city){
-                    data.address.shipping.city = addressIn.shipping.city
+                if(address.billing){
+    
+                    if(address.billing.street){
+                        if (!validString(address.billing.street))
+                            return res.status(400).send({ status: false, message: "street field is  not valid" })
+                    addressData.address.billing.street=address.billing.street
+                    }
+                    if(address.billing.city){
+                        if (!validString(address.billing.city))
+                            return res.status(400).send({ status: false, message: "city field is  not valid" })
+                            addressData.address.billing.city=address.billing.city
+                    }
+                    
+                    if(address.billing.pincode){
+                        if (!validPin.test(address.billing.pincode))
+                            return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only" })
+                            addressData.address.billing.pincode=address.billing.pincode
+                    }
                 }
-
-                
-                if (!validString(addressIn.shipping.pincode)) return res.status(400).send({ status: false, message: "please enter Shipping pincode" })
-                if (!validPin.test(addressIn.shipping.pincode)) return res.status(400).send({ status: false, message: "please enter valied Shipping pincode " })
-                if(addressIn.shipping.pincode){
-                    data.address.shipping.pincode = addressIn.shipping.pincode
-                }               
-            }
-
-            if (addressIn.billing) {
-                if (!isValidRequestBody(address.billing)) return res.status(400).send({ status: false, message: "billing address cant't be empty Please enter some data." })
-                if (!validString(address.billing.street)) return res.status(400).send({ status: false, message: "please enter billing street " })
-                if(addressIn.billing.street){
-                    data.address.billing.street = addressIn.billing.street
-                }
-                
-                if (!validString(address.billing.city)) return res.status(400).send({ status: false, message: "please enter billing city" })
-                if(addressIn.billing.city){
-                    data.address.billing.city = addressIn.billing.city
-                }
-                
-                if (!validString(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter billing pincode" })
-                if (!validPin.test(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter valied billing pincode " })
-                if(addressIn.billing.pincode){
-                    data.address.billing.pincode = addressIn.billing.pincode
-                }
-
-            }
+                address=addressData.address
         }
-
-        const user = await userModel.findOneAndUpdate({ _id: userId }, { $set: data }, { new: true })
+    
+        const user = await userModel.findOneAndUpdate({ _id: userId }, { $set: {data, address} }, { new: true })
 
         if (!user) return res.status(404).send({ status: false, message: "User not found" })
 

@@ -9,7 +9,7 @@ const { createOrder, updateOrder } = require("../controllers/orderController")
 //=========================================================== User Api's ===============================================================//
 router.post("/register", createUser)
 router.post("/login", login)
-router.get("/user/:userId/profile", authentication, getUser)
+router.get("/user/:userId/profile", authentication, authorization, getUser)
 router.put("/user/:userId/profile", authentication, authorization, updateUser)
 
 //=========================================================== Product Api's ============================================================//

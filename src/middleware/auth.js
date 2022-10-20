@@ -5,33 +5,27 @@ const mongoose = require('mongoose')
 
 const authentication = function (req, res, next) {
     try {
-        let token = req.header('Authorization')
-        if (!token) {
-            return res.status(401).send({ status: false, msg: " token is required" })
+        let bearerHeader = req.headers.authorization;
+        if (typeof bearerHeader == "undefined") {
+            return res.status(401).send({ status: false, message: "Token is missing! please enter token." });
         }
-        let newToken = token.split(' ')
-        let decodedToken = jwt.verify(newToken[1], "secret code group 19", { ignoreExpiration: true })
-        if (!decodedToken) {
-            return res.status(401).send({ status: false, msg: "token is invalid" })
-        }
-        let timeToExpire = Math.floor(Date.now() / 1000)
-        if (decodedToken.exp < timeToExpire) {
-            return res.status(401).send({ status: false, msg: "token is expired please login again" })
-        }
-        req.decodedToken = decodedToken.userId
-        next()
-    }
-    
-    catch (err) {
-        if (err.message == "invalid token") {
-            return res.status(401).send({ status: false, message: "token is invalid" });
-        }
-        if (err.message == "invalid signature") {
-            return res.status(401).send({ status: false, message: "token is invalid" });
-        }
+        let bearerToken = bearerHeader.split(' '); // converting it to array 
+        let token = bearerToken[1];
+        jwt.verify(token, "secret code group 19", function (error, data) {
+            if (error && error.message == "jwt expired") {
+                return res.status(401).send({ status: false, message: "Session expired! Please login again." })
+            }
+            if (error) {
+                return res.status(401).send({ status: false, message: "Incorrect token" })
+            }
+            else {
+                req.decodedToken = data.userId;
 
-        return res.status(500).send({ status: false, message: err.message });
-
+                next()
+            }
+        });
+    } catch (error) {
+        return res.status(500).send({ status: false, error: error.message });
     }
 }
 

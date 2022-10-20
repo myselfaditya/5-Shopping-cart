@@ -21,6 +21,8 @@ let isValidNumber = (String) => {
     return /\d/.test(String)  
 }
 
+let urlreg = /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i
+
 const isValidDigit=function(value) {
     return /^\d+$/.test(value)
 } 
@@ -55,12 +57,14 @@ const isValidPassword = function (value) {
     return false;
 };
 
-
+let isValidStatus = (status) => {
+    return ['pending', 'completed', 'cancelled'].includes(status);
+}
 
 let imgUrl = /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i
 
 //const regExLogoLink =  /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
 
 module.exports = {
-    isValidMail, isValid, isValidName, isValidRequestBody,isValidMobile, isValidfild, isValidPrice, validSizes, isValidNumber, isValidPassword, imgUrl, validPin, isValidDigit, validString
+    isValidMail, isValid,isValidStatus, isValidName, isValidRequestBody,isValidMobile, isValidfild, urlreg, isValidPrice, validSizes, isValidNumber, isValidPassword, imgUrl, validPin, isValidDigit, validString
 }
