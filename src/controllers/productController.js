@@ -25,7 +25,7 @@ const createProduct = async function (req, res) {
         //if (!isValid(currencyId)) return res.status(400).send({ status: false, message: "currencyId is required" })
         if(currencyId){if (!(/INR/.test(currencyId))) return res.status(400).send({ status: false, message: " currencyId should be in 'INR' Format" });}
 
-        //if (!currencyFormat) return res.status(400).send({ status: false, message: "currencyformat is required" });
+        if (!isValid(currencyFormat)) return res.status(400).send({ status: false, message: "currencyformat is required" });
         if (currencyFormat) {
             if (!(/₹/.test(currencyFormat))) return res.status(400).send({ status: false, message: "Currency format of product should be in '₹' " });
         }
